@@ -3,6 +3,7 @@ import 'package:pie_controls/src/pie_controls_item.dart';
 import 'package:pie_controls/src/pie_drawer.dart';
 import 'dart:math' as math;
 
+// TODO:Hovering on edge cases broken fix your _currentOffsetFromLocal
 class PieControls extends StatefulWidget {
   const PieControls({
     Key? key,
@@ -372,8 +373,9 @@ class _PieControlsState extends State<PieControls> {
 
 @immutable
 class TriggerPositions {
-  /// Only two out of three size values ([startMargin],[size],[endMargin]) can
-  /// be set. At least one of the three must be null.
+  /// Only two out of three size values ([startMargin],[size],[endMargin]) can be set.
+  ///
+  /// At least one of the three must be null.
   const TriggerPositions({
     this.startMargin,
     this.size,
