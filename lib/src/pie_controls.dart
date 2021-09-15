@@ -11,8 +11,8 @@ class PieControls extends StatefulWidget {
     this.pieSize = 80,
     this.piePadding = 30,
     this.pieMargin = 4,
-    this.angle = math.pi,
     this.color = Colors.orange,
+    this.onHoverColor = Colors.deepOrange,
     this.triggerAreaSize = 15,
     this.showTriggerArea = false,
     required this.triggerPositions,
@@ -28,9 +28,9 @@ class PieControls extends StatefulWidget {
 
   final double pieMargin;
 
-  final double angle;
-
   final Color color;
+
+  final Color onHoverColor;
 
   final bool showTriggerArea;
 
@@ -44,14 +44,20 @@ class PieControls extends StatefulWidget {
 
 class _PieControlsState extends State<PieControls> {
   final ValueNotifier<bool> _triggered = ValueNotifier<bool>(false);
+  final ValueNotifier<int> _hoveredIndex = ValueNotifier<int>(-1);
   late TriggerPositions _triggeredPosition;
   final ValueNotifier<Offset> _currentOffsetFromLocal =
       ValueNotifier<Offset>(Offset.zero);
   Offset _triggerStartedOffsetFromLocal = Offset.zero;
   Offset _triggerStartedOffsetFromParent = Offset.zero;
-
+  late double _totalAngle;
   @override
   Widget build(BuildContext context) {
+    assert(widget.pies.isNotEmpty);
+    _totalAngle = widget.pies
+        .map((e) => e.angle)
+        .reduce((value, element) => value + element);
+    assert(_totalAngle <= math.pi);
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
@@ -181,9 +187,11 @@ class _PieControlsState extends State<PieControls> {
       left: _left,
       right: _right,
       child: PieDrawer(
+        hoveredIndex: _hoveredIndex,
         pieMargin: widget.pieMargin,
-        angle: widget.angle,
+        totalAngle: _totalAngle,
         color: widget.color,
+        onHoverColor: widget.onHoverColor,
         piePadding: widget.piePadding,
         pies: widget.pies,
         pieSize: widget.pieSize,
@@ -231,6 +239,7 @@ class _PieControlsState extends State<PieControls> {
       child: GestureDetector(
         onPanUpdate: (details) => _handleOnPanUpdate(
             details, _vertical, triggerPositions, constraints),
+        onPanEnd: _handleOnPanEnd,
         child: Container(
           color: widget.showTriggerArea ? Colors.blue : Colors.transparent,
           height: _height,
@@ -288,12 +297,58 @@ class _PieControlsState extends State<PieControls> {
     }
     if (_triggered.value) {
       _currentOffsetFromLocal.value = _localOffset;
-      Offset _currentOffsetFromTriggered =
+      final _currentOffsetFromTriggered =
           _localOffset - _triggerStartedOffsetFromLocal;
-      debugPrint(_currentOffsetFromTriggered.direction.toString() +
-          " " +
-          _currentOffsetFromTriggered.distance.toString());
+      final _currentDistance = _currentOffsetFromTriggered.distance;
+
+      if (_currentDistance > widget.piePadding &&
+          _currentDistance < widget.pieSize) {
+        double _currentAngle = _currentOffsetFromTriggered.direction;
+
+        switch (triggerPositions.alignement) {
+          case TriggerAlignement.top:
+            break;
+          case TriggerAlignement.bottom:
+            _currentAngle += math.pi;
+            break;
+          case TriggerAlignement.left:
+            _currentAngle += math.pi / 2;
+            break;
+          case TriggerAlignement.right:
+            _currentAngle = _currentAngle.isNegative
+                ? _currentAngle + (2 * math.pi)
+                : _currentAngle;
+            _currentAngle -= math.pi / 2;
+            break;
+        }
+        _selectPieFromAngle(_currentAngle);
+      } else {
+        _hoveredIndex.value = -1;
+      }
     }
+  }
+
+  void _selectPieFromAngle(double currentAngle) {
+    double angle = (math.pi - _totalAngle) / 2;
+    if (currentAngle > angle && currentAngle < math.pi - angle) {
+      int index = 0;
+      while (currentAngle > angle) {
+        angle += widget.pies[index].angle;
+        index++;
+      }
+      if (_hoveredIndex.value != index - 1) {
+        _hoveredIndex.value = index - 1;
+        widget.pies[index - 1].onHover?.call();
+      }
+    } else {
+      _hoveredIndex.value = -1;
+    }
+  }
+
+  void _handleOnPanEnd(DragEndDetails details) {
+    _triggered.value = false;
+    if (_hoveredIndex.value == -1) return;
+    widget.pies[_hoveredIndex.value].onTriggered?.call();
   }
 
   static Offset _calculateParentOffset(

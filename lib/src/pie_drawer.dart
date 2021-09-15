@@ -15,8 +15,10 @@ class PieDrawer extends StatelessWidget {
     required this.pies,
     required this.piePadding,
     required this.pieMargin,
-    required this.angle,
+    required this.totalAngle,
     required this.color,
+    required this.onHoverColor,
+    required this.hoveredIndex,
   }) : super(key: key);
 
   final List<PieControlsItem> pies;
@@ -27,13 +29,17 @@ class PieDrawer extends StatelessWidget {
 
   final double piePadding;
 
-  final double angle;
+  final double totalAngle;
 
   final Color color;
+
+  final Color onHoverColor;
 
   final TriggerAlignement alignement;
 
   final ValueNotifier<Offset> currentOffsetFromLocal;
+
+  final ValueNotifier<int> hoveredIndex;
 
   final Offset triggerStartedOffset;
 
@@ -47,10 +53,12 @@ class PieDrawer extends StatelessWidget {
           Positioned.fill(
             child: CustomPaint(
               painter: PiePainter(
+                hoveredIndex: hoveredIndex,
                 pieMargin: pieMargin,
-                pieCount: pies.length,
-                angle: angle,
+                pies: pies,
+                totalAngle: totalAngle,
                 color: color,
+                onHoverColor: onHoverColor,
                 piePadding: piePadding,
                 pieSize: pieSize,
               ),
@@ -82,42 +90,37 @@ class PieDrawer extends StatelessWidget {
   }
 
   List<Widget> _buildPieChilds() {
-    return pies
-        .asMap()
-        .map((index, pieControlsItem) {
-          double _angle = (2 * index + 1) / (2 * pies.length) * angle +
-              ((math.pi - angle) / 2);
+    double startingAngle = (math.pi - totalAngle) / 2;
+    return pies.map((pieControlsItem) {
+      double _angle = startingAngle + pieControlsItem.angle / 2;
+      startingAngle += pieControlsItem.angle;
 
-          double _r = (pieSize + piePadding) / 2;
+      double _r = (pieSize + piePadding) / 2;
 
-          return MapEntry(
-            index,
-            Positioned(
-              top: pieSize -
-                  math.cos(_angle) * _r -
-                  (pieControlsItem.childSize / 2),
-              left: math.sin(_angle) * _r - (pieControlsItem.childSize / 2),
-              child:
-                  Transform.rotate(angle: _angle, child: pieControlsItem.child),
-            ),
-          );
-        })
-        .values
-        .toList();
+      return Positioned(
+        top: pieSize - math.cos(_angle) * _r - (pieControlsItem.childSize / 2),
+        left: math.sin(_angle) * _r - (pieControlsItem.childSize / 2),
+        child: Transform.rotate(angle: _angle, child: pieControlsItem),
+      );
+    }).toList();
   }
 }
 
 class PiePainter extends CustomPainter {
   PiePainter({
-    required this.pieCount,
+    required this.hoveredIndex,
+    required this.pies,
     required this.pieSize,
     required this.piePadding,
     required this.pieMargin,
-    required this.angle,
+    required this.totalAngle,
     required this.color,
-  });
+    required this.onHoverColor,
+  }) : super(repaint: hoveredIndex);
 
-  final int pieCount;
+  final ValueNotifier<int> hoveredIndex;
+
+  final List<PieControlsItem> pies;
 
   final double pieSize;
 
@@ -125,14 +128,20 @@ class PiePainter extends CustomPainter {
 
   final double pieMargin;
 
-  final double angle;
+  final double totalAngle;
 
   final Color color;
+
+  final Color onHoverColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final piePaint = Paint()
       ..color = color
+      ..style = PaintingStyle.fill;
+
+    final hoverPaint = Paint()
+      ..color = onHoverColor
       ..style = PaintingStyle.fill;
 
     final fillEraser = Paint()..blendMode = BlendMode.clear;
@@ -145,28 +154,48 @@ class PiePainter extends CustomPainter {
     canvas.saveLayer(Offset.zero & size, Paint());
     canvas.drawArc(
       Rect.fromLTWH(-pieSize, 0, 2 * pieSize, 2 * pieSize),
-      -angle / 2,
-      angle,
+      -totalAngle / 2,
+      totalAngle,
       true,
       piePaint,
     );
 
-    canvas.drawArc(
-      Rect.fromLTWH(
-          -piePadding, pieSize - piePadding, 2 * piePadding, 2 * piePadding),
-      -angle / 2,
-      angle,
-      true,
-      fillEraser,
+    double currentAngle = -totalAngle / 2;
+
+    canvas.drawLine(
+      Offset(0, pieSize),
+      Offset(pieSize * math.cos(currentAngle),
+          pieSize + pieSize * math.sin(currentAngle)),
+      eraser,
     );
-    for (var i = 0; i < pieCount + 1; i++) {
+
+    for (var i = 0; i < pies.length; i++) {
+      if (hoveredIndex.value == i) {
+        canvas.drawArc(
+          Rect.fromLTWH(-pieSize, 0, 2 * pieSize, 2 * pieSize),
+          currentAngle,
+          pies[hoveredIndex.value].angle,
+          true,
+          hoverPaint,
+        );
+      }
+      currentAngle += pies[i].angle;
       canvas.drawLine(
         Offset(0, pieSize),
-        Offset(pieSize * math.cos((angle / pieCount * i) - angle / 2),
-            pieSize + pieSize * math.sin((angle / pieCount * i) - angle / 2)),
+        Offset(pieSize * math.cos(currentAngle),
+            pieSize + pieSize * math.sin(currentAngle)),
         eraser,
       );
     }
+
+    canvas.drawArc(
+      Rect.fromLTWH(
+          -piePadding, pieSize - piePadding, 2 * piePadding, 2 * piePadding),
+      -totalAngle / 2,
+      totalAngle,
+      true,
+      fillEraser,
+    );
 
     canvas.restore();
   }
