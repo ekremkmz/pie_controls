@@ -3,7 +3,6 @@ import 'package:pie_controls/src/pie_controls_item.dart';
 import 'package:pie_controls/src/pie_drawer.dart';
 import 'dart:math' as math;
 
-// TODO:Hovering on edge cases broken fix your _currentOffsetFromLocal
 class PieControls extends StatefulWidget {
   const PieControls({
     Key? key,
@@ -58,7 +57,7 @@ class _PieControlsState extends State<PieControls> {
     _totalAngle = widget.pies
         .map((e) => e.angle)
         .reduce((value, element) => value + element);
-    assert(_totalAngle <= math.pi);
+    assert(_totalAngle <= math.pi, "Total angle can't be bigger than PI");
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
@@ -91,11 +90,18 @@ class _PieControlsState extends State<PieControls> {
             _triggerStartedOffsetFromParent.dx + widget.pieSize;
 
         if (pieStartingPoint.isNegative) {
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx + pieStartingPoint.abs(),
+            _triggerStartedOffsetFromLocal.dy,
+          );
           pieEndingPoint += pieStartingPoint.abs();
           pieStartingPoint = 0.0;
-        }
-        if (pieEndingPoint > constraints.maxWidth) {
+        } else if (pieEndingPoint > constraints.maxWidth) {
           double dx = pieEndingPoint - constraints.maxWidth;
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx - dx,
+            _triggerStartedOffsetFromLocal.dy,
+          );
           pieStartingPoint -= dx;
           pieEndingPoint -= dx;
         }
@@ -116,11 +122,18 @@ class _PieControlsState extends State<PieControls> {
             _triggerStartedOffsetFromParent.dx + widget.pieSize;
 
         if (pieStartingPoint.isNegative) {
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx + pieStartingPoint.abs(),
+            _triggerStartedOffsetFromLocal.dy,
+          );
           pieEndingPoint += pieStartingPoint.abs();
           pieStartingPoint = 0.0;
-        }
-        if (pieEndingPoint > constraints.maxWidth) {
+        } else if (pieEndingPoint > constraints.maxWidth) {
           double dx = pieEndingPoint - constraints.maxWidth;
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx - dx,
+            _triggerStartedOffsetFromLocal.dy,
+          );
           pieStartingPoint -= dx;
           pieEndingPoint -= dx;
         }
@@ -141,11 +154,18 @@ class _PieControlsState extends State<PieControls> {
             _triggerStartedOffsetFromParent.dy + widget.pieSize;
 
         if (pieStartingPoint.isNegative) {
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx,
+            _triggerStartedOffsetFromLocal.dy + pieStartingPoint.abs(),
+          );
           pieEndingPoint += pieStartingPoint.abs();
           pieStartingPoint = 0.0;
-        }
-        if (pieEndingPoint > constraints.maxHeight) {
+        } else if (pieEndingPoint > constraints.maxHeight) {
           double dx = pieEndingPoint - constraints.maxHeight;
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx,
+            _triggerStartedOffsetFromLocal.dy - dx,
+          );
           pieStartingPoint -= dx;
           pieEndingPoint -= dx;
         }
@@ -166,11 +186,18 @@ class _PieControlsState extends State<PieControls> {
             _triggerStartedOffsetFromParent.dy + widget.pieSize;
 
         if (pieStartingPoint.isNegative) {
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx,
+            _triggerStartedOffsetFromLocal.dy + pieStartingPoint.abs(),
+          );
           pieEndingPoint += pieStartingPoint.abs();
           pieStartingPoint = 0.0;
-        }
-        if (pieEndingPoint > constraints.maxHeight) {
+        } else if (pieEndingPoint > constraints.maxHeight) {
           double dx = pieEndingPoint - constraints.maxHeight;
+          _triggerStartedOffsetFromLocal = Offset(
+            _triggerStartedOffsetFromLocal.dx,
+            _triggerStartedOffsetFromLocal.dy - dx,
+          );
           pieStartingPoint -= dx;
           pieEndingPoint -= dx;
         }
