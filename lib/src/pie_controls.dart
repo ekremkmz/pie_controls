@@ -108,7 +108,7 @@ class _PieControlsState extends State<PieControls> {
         _left = pieStartingPoint;
         _right = constraints.maxWidth - pieEndingPoint;
         _triggerStartedOffsetFromParent = Offset(
-          (pieEndingPoint - pieStartingPoint) / 2,
+          (pieEndingPoint + pieStartingPoint) / 2,
           _triggerStartedOffsetFromLocal.dy,
         );
         break;
@@ -140,7 +140,7 @@ class _PieControlsState extends State<PieControls> {
         _left = pieStartingPoint;
         _right = constraints.maxWidth - pieEndingPoint;
         _triggerStartedOffsetFromParent = Offset(
-          (pieEndingPoint - pieStartingPoint) / 2,
+          (pieEndingPoint + pieStartingPoint) / 2,
           _triggerStartedOffsetFromLocal.dy,
         );
         break;
@@ -173,7 +173,7 @@ class _PieControlsState extends State<PieControls> {
         _bottom = constraints.maxHeight - pieEndingPoint;
         _triggerStartedOffsetFromParent = Offset(
           _triggerStartedOffsetFromLocal.dx,
-          (pieEndingPoint - pieStartingPoint) / 2,
+          (pieEndingPoint + pieStartingPoint) / 2,
         );
         break;
       case TriggerAlignement.right:
@@ -205,7 +205,7 @@ class _PieControlsState extends State<PieControls> {
         _bottom = constraints.maxHeight - pieEndingPoint;
         _triggerStartedOffsetFromParent = Offset(
           _triggerStartedOffsetFromLocal.dx,
-          (pieEndingPoint - pieStartingPoint) / 2,
+          (pieEndingPoint + pieStartingPoint) / 2,
         );
         break;
     }
@@ -224,7 +224,6 @@ class _PieControlsState extends State<PieControls> {
         pies: widget.pies,
         pieSize: widget.pieSize,
         alignement: _triggeredPosition.alignement,
-        currentOffsetFromLocal: _currentOffsetFromLocal,
         triggerStartedOffset: _triggerStartedOffsetFromLocal,
       ),
     );
