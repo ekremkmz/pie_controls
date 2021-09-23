@@ -349,7 +349,8 @@ class _PieControlsState extends State<PieControls> {
             break;
         }
         _selectPieFromAngle(_currentAngle);
-      } else {
+      } else if (_hoveredIndex.value != -1) {
+        widget.pies[_hoveredIndex.value].onHoverEnd?.call();
         _hoveredIndex.value = -1;
       }
     }
@@ -364,10 +365,14 @@ class _PieControlsState extends State<PieControls> {
         index++;
       }
       if (_hoveredIndex.value != index - 1) {
+        if (_hoveredIndex.value != -1) {
+          widget.pies[_hoveredIndex.value].onHoverEnd?.call();
+        }
         _hoveredIndex.value = index - 1;
         widget.pies[index - 1].onHover?.call();
       }
-    } else {
+    } else if (_hoveredIndex.value != -1) {
+      widget.pies[_hoveredIndex.value].onHoverEnd?.call();
       _hoveredIndex.value = -1;
     }
   }

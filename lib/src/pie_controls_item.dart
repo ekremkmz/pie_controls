@@ -10,6 +10,7 @@ class PieControlsItem extends StatelessWidget {
     required this.angle,
     this.onTriggered,
     this.onHover,
+    this.onHoverEnd,
   })  : assert(angle <= math.pi),
         super(key: key);
 
@@ -24,6 +25,8 @@ class PieControlsItem extends StatelessWidget {
   final VoidCallback? onTriggered;
 
   final VoidCallback? onHover;
+
+  final VoidCallback? onHoverEnd;
 
   @override
   Widget build(BuildContext context) {
