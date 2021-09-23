@@ -31,9 +31,23 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final _counter = ValueNotifier<int>(0);
   final _message = ValueNotifier<String>("");
+  List<AnimationController>? _pieAnimationControllers;
+  @override
+  void initState() {
+    super.initState();
+    _pieAnimationControllers = List.generate(
+      3,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(
+          milliseconds: 1000,
+        ),
+      ),
+    );
+  }
 
   void _incrementCounter() {
     _counter.value++;
@@ -48,14 +62,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _hoveredIncrement() {
+    _pieAnimationControllers![0].reset();
+    _pieAnimationControllers![0].forward();
     _message.value = "Hovered increment";
   }
 
   void _hoveredDecrement() {
+    _pieAnimationControllers![1].reset();
+    _pieAnimationControllers![1].forward();
     _message.value = "Hovered decrement";
   }
 
   void _hoveredReset() {
+    _pieAnimationControllers![2].reset();
+    _pieAnimationControllers![2].forward();
     _message.value = "Hovered reset";
   }
 
@@ -68,22 +88,46 @@ class _MyHomePageState extends State<MyHomePage> {
         PieControlsItem(
           onTriggered: _incrementCounter,
           onHover: _hoveredIncrement,
-          child: const Icon(Icons.add),
-          childSize: 24,
+          child: AnimatedBuilder(
+            child: const Icon(Icons.add),
+            animation: _pieAnimationControllers![0],
+            builder: (BuildContext context, Widget? child) {
+              return Transform.rotate(
+                angle: _pieAnimationControllers![0].value * 2 * math.pi,
+                child: child,
+              );
+            },
+          ),
           angle: math.pi / 3,
         ),
         PieControlsItem(
           onHover: _hoveredDecrement,
           onTriggered: _decrementCounter,
-          child: const Icon(Icons.remove),
-          childSize: 24,
+          child: AnimatedBuilder(
+            child: const Icon(Icons.remove),
+            animation: _pieAnimationControllers![1],
+            builder: (BuildContext context, Widget? child) {
+              return Transform.rotate(
+                angle: _pieAnimationControllers![1].value * 2 * math.pi,
+                child: child,
+              );
+            },
+          ),
           angle: math.pi / 3,
         ),
         PieControlsItem(
           onHover: _hoveredReset,
           onTriggered: _resetCounter,
-          child: const Icon(Icons.refresh),
-          childSize: 24,
+          child: AnimatedBuilder(
+            child: const Icon(Icons.refresh),
+            animation: _pieAnimationControllers![2],
+            builder: (BuildContext context, Widget? child) {
+              return Transform.rotate(
+                angle: _pieAnimationControllers![2].value * 2 * math.pi,
+                child: child,
+              );
+            },
+          ),
           angle: math.pi / 6,
         ),
       ],
