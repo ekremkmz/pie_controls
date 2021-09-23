@@ -5,7 +5,8 @@ class PieControlsItem extends StatelessWidget {
   const PieControlsItem({
     Key? key,
     required this.child,
-    required this.childSize,
+    this.maxChildHeight = 100,
+    this.maxChildWidth = 100,
     required this.angle,
     this.onTriggered,
     this.onHover,
@@ -14,7 +15,9 @@ class PieControlsItem extends StatelessWidget {
 
   final Widget child;
 
-  final double childSize;
+  final double maxChildHeight;
+
+  final double maxChildWidth;
 
   final double angle;
 
@@ -25,9 +28,11 @@ class PieControlsItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: childSize,
-      width: childSize,
-      child: child,
+      height: maxChildHeight,
+      width: maxChildWidth,
+      child: Center(
+        child: child,
+      ),
     );
   }
 }

@@ -95,8 +95,10 @@ class PieDrawer extends StatelessWidget {
       double _r = (pieSize + piePadding) / 2;
 
       return Positioned(
-        top: pieSize - math.cos(_angle) * _r - (pieControlsItem.childSize / 2),
-        left: math.sin(_angle) * _r - (pieControlsItem.childSize / 2),
+        top: pieSize -
+            math.cos(_angle) * _r -
+            (pieControlsItem.maxChildHeight / 2),
+        left: math.sin(_angle) * _r - (pieControlsItem.maxChildWidth / 2),
         child: Transform.rotate(angle: _angle, child: pieControlsItem),
       );
     }).toList();
