@@ -10,7 +10,6 @@ class PieDrawer extends StatelessWidget {
     Key? key,
     required this.pieSize,
     required this.alignement,
-    required this.currentOffsetFromLocal,
     required this.triggerStartedOffset,
     required this.pies,
     required this.piePadding,
@@ -36,8 +35,6 @@ class PieDrawer extends StatelessWidget {
   final Color onHoverColor;
 
   final TriggerAlignement alignement;
-
-  final ValueNotifier<Offset> currentOffsetFromLocal;
 
   final ValueNotifier<int> hoveredIndex;
 
