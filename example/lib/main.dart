@@ -51,32 +51,50 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   void _incrementCounter() {
     _counter.value++;
+    _message.value = "Triggered increment";
   }
 
   void _decrementCounter() {
     _counter.value--;
+    _message.value = "Triggered decrement";
   }
 
   void _resetCounter() {
     _counter.value = 0;
+    _message.value = "Triggered reset";
   }
 
-  void _hoveredIncrement() {
+  void _hoverIncrement() {
     _pieAnimationControllers![0].reset();
     _pieAnimationControllers![0].forward();
     _message.value = "Hovered increment";
   }
 
-  void _hoveredDecrement() {
+  void _hoverDecrement() {
     _pieAnimationControllers![1].reset();
     _pieAnimationControllers![1].forward();
     _message.value = "Hovered decrement";
   }
 
-  void _hoveredReset() {
+  void _hoverReset() {
     _pieAnimationControllers![2].reset();
     _pieAnimationControllers![2].forward();
     _message.value = "Hovered reset";
+  }
+
+  void _hoverEndIncrement() {
+    _pieAnimationControllers![0].reset();
+    _message.value = "";
+  }
+
+  void _hoverEndDecrement() {
+    _pieAnimationControllers![1].reset();
+    _message.value = "";
+  }
+
+  void _hoverEndReset() {
+    _pieAnimationControllers![2].reset();
+    _message.value = "";
   }
 
   @override
@@ -87,7 +105,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       pies: [
         PieControlsItem(
           onTriggered: _incrementCounter,
-          onHover: _hoveredIncrement,
+          onHover: _hoverIncrement,
+          onHoverEnd: _hoverEndIncrement,
           child: AnimatedBuilder(
             child: const Icon(Icons.add),
             animation: _pieAnimationControllers![0],
@@ -101,8 +120,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           angle: math.pi / 3,
         ),
         PieControlsItem(
-          onHover: _hoveredDecrement,
           onTriggered: _decrementCounter,
+          onHover: _hoverDecrement,
+          onHoverEnd: _hoverEndDecrement,
           child: AnimatedBuilder(
             child: const Icon(Icons.remove),
             animation: _pieAnimationControllers![1],
@@ -116,8 +136,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           angle: math.pi / 3,
         ),
         PieControlsItem(
-          onHover: _hoveredReset,
+          onHover: _hoverReset,
           onTriggered: _resetCounter,
+          onHoverEnd: _hoverEndReset,
           child: AnimatedBuilder(
             child: const Icon(Icons.refresh),
             animation: _pieAnimationControllers![2],
